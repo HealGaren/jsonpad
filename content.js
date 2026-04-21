@@ -226,8 +226,13 @@
     editor.value = prettyInitial;
 
     let iframeReady = false;
-    let pendingPayload = null;
+    let lastPayload = null;
     let activeTab = "raw";
+
+    const postPayload = () => {
+      if (!lastPayload) return;
+      try { iframe.contentWindow.postMessage(lastPayload, "*"); } catch {}
+    };
 
     const sendToJsoncrack = (text) => {
       let payload;
@@ -236,28 +241,26 @@
       } catch {
         payload = text || "{}";
       }
-      const msg = {
+      lastPayload = {
         json: payload,
         options: { theme: "dark", direction: "RIGHT" },
       };
-      if (iframeReady) {
-        iframe.contentWindow.postMessage(msg, "*");
-      } else {
-        pendingPayload = msg;
-      }
+      if (iframeReady) postPayload();
     };
 
     const onWindowMessage = (ev) => {
-      if (ev.source !== iframe.contentWindow) return;
-      if (ev.data === "json-crack-embed") {
-        iframeReady = true;
-        if (pendingPayload) {
-          iframe.contentWindow.postMessage(pendingPayload, "*");
-          pendingPayload = null;
-        }
-      }
+      if (ev.data !== "json-crack-embed") return;
+      iframeReady = true;
+      postPayload();
     };
     window.addEventListener("message", onWindowMessage);
+
+    // Fallback: if we miss the ready ping, push payload on load and again shortly after.
+    iframe.addEventListener("load", () => {
+      postPayload();
+      setTimeout(postPayload, 300);
+      setTimeout(postPayload, 1000);
+    });
 
     const setTab = (name) => {
       activeTab = name;
