@@ -195,7 +195,10 @@
           <button class="jsonpad-close" data-act="close" aria-label="close">×</button>
         </div>
         <div class="jsonpad-body" data-view="split">
-          <textarea class="jsonpad-editor jsonpad-pane" data-pane="raw" spellcheck="false"></textarea>
+          <div class="jsonpad-pane jsonpad-editor-wrap" data-pane="raw">
+            <pre class="jsonpad-highlight" aria-hidden="true"><code></code></pre>
+            <textarea class="jsonpad-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+          </div>
           <div class="jsonpad-resizer" role="separator" aria-orientation="vertical" title="drag to resize"></div>
           <div class="jsonpad-viewer jsonpad-pane" data-pane="jsoncrack">
             <iframe class="jsonpad-jsoncrack" src="https://jsoncrack.com/widget" title="jsoncrack"></iframe>
@@ -204,7 +207,7 @@
         <div class="jsonpad-status" data-status="idle"></div>
         <div class="jsonpad-footer">
           <div class="jsonpad-left">
-            <button class="jsonpad-btn" data-act="format">format</button>
+            <button class="jsonpad-btn" data-act="format" title="pretty-print (Ctrl/Cmd+S)">format</button>
             <button class="jsonpad-btn" data-act="validate">validate</button>
             <button class="jsonpad-btn" data-act="paste">paste from clipboard</button>
             <button class="jsonpad-btn" data-act="copy-prompt" title="copy a prompt template to ask AI for a schema/preset">copy AI prompt</button>
@@ -222,6 +225,8 @@
     modalHost = host;
 
     const editor = host.querySelector(".jsonpad-editor");
+    const highlightCode = host.querySelector(".jsonpad-highlight code");
+    const highlightPre = host.querySelector(".jsonpad-highlight");
     const status = host.querySelector(".jsonpad-status");
     const presetSelect = host.querySelector(".jsonpad-preset-select");
     const iframe = host.querySelector(".jsonpad-jsoncrack");
@@ -229,6 +234,117 @@
     const resizer = host.querySelector(".jsonpad-resizer");
     const viewButtons = host.querySelectorAll(".jsonpad-view");
     editor.value = prettyInitial;
+
+    // ----- syntax highlighting -----
+    const escapeHtml = (s) => s.replace(/[&<>]/g, (c) =>
+      c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;"
+    );
+    const JSON_TOKEN = /("(?:\\.|[^"\\])*"\s*(?=:))|("(?:\\.|[^"\\])*")|(\b(?:true|false|null)\b)|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|([{}[\],:])/g;
+    const renderHighlight = (text) => {
+      let out = "";
+      let last = 0;
+      text.replace(JSON_TOKEN, (m, key, str, bool, num, punct, idx) => {
+        out += escapeHtml(text.slice(last, idx));
+        const cls = key ? "jp-key" : str ? "jp-str" : bool ? "jp-bool" : num ? "jp-num" : "jp-punct";
+        out += `<span class="${cls}">${escapeHtml(m)}</span>`;
+        last = idx + m.length;
+        return m;
+      });
+      out += escapeHtml(text.slice(last));
+      return out + "\n";
+    };
+    const updateHighlight = () => {
+      highlightCode.innerHTML = renderHighlight(editor.value);
+    };
+    const syncScroll = () => {
+      highlightPre.scrollTop = editor.scrollTop;
+      highlightPre.scrollLeft = editor.scrollLeft;
+    };
+    editor.addEventListener("input", updateHighlight);
+    editor.addEventListener("scroll", syncScroll);
+
+    // ----- indent helpers -----
+    const INDENT = "  ";
+    const setTextareaValue = (ta, nextValue, selStart, selEnd) => {
+      ta.value = nextValue;
+      ta.selectionStart = selStart;
+      ta.selectionEnd = selEnd ?? selStart;
+      updateHighlight();
+    };
+    const handleTab = (ta, shift) => {
+      const { selectionStart: s, selectionEnd: e, value } = ta;
+      if (s === e) {
+        if (!shift) {
+          const lineStart = value.lastIndexOf("\n", s - 1) + 1;
+          const col = s - lineStart;
+          const fill = INDENT.length - (col % INDENT.length);
+          const insert = " ".repeat(fill || INDENT.length);
+          setTextareaValue(ta, value.slice(0, s) + insert + value.slice(e), s + insert.length);
+        } else {
+          const lineStart = value.lastIndexOf("\n", s - 1) + 1;
+          const remove = value.slice(lineStart).match(/^ {1,2}/);
+          if (remove) {
+            const n = remove[0].length;
+            setTextareaValue(ta, value.slice(0, lineStart) + value.slice(lineStart + n), Math.max(lineStart, s - n));
+          }
+        }
+        return;
+      }
+      const blockStart = value.lastIndexOf("\n", s - 1) + 1;
+      let blockEnd = value.indexOf("\n", e > blockStart && value[e - 1] === "\n" ? e - 1 : e);
+      if (blockEnd === -1) blockEnd = value.length;
+      const block = value.slice(blockStart, blockEnd);
+      const lines = block.split("\n");
+      let delta0 = 0, deltaN = 0;
+      let newLines;
+      if (!shift) {
+        newLines = lines.map((l) => INDENT + l);
+        delta0 = INDENT.length;
+        deltaN = INDENT.length * lines.length;
+      } else {
+        newLines = lines.map((l) => {
+          const m = l.match(/^ {1,2}/);
+          if (!m) return l;
+          deltaN -= m[0].length;
+          return l.slice(m[0].length);
+        });
+        const first = lines[0].match(/^ {1,2}/);
+        delta0 = first ? -first[0].length : 0;
+      }
+      const newBlock = newLines.join("\n");
+      setTextareaValue(
+        ta,
+        value.slice(0, blockStart) + newBlock + value.slice(blockEnd),
+        s + delta0,
+        e + deltaN
+      );
+    };
+    const handleEnter = (ta) => {
+      const { selectionStart: s, selectionEnd: e, value } = ta;
+      const lineStart = value.lastIndexOf("\n", s - 1) + 1;
+      const indent = (value.slice(lineStart, s).match(/^\s*/) || [""])[0];
+      const prev = value[s - 1];
+      const next = value[e];
+      let insert = "\n" + indent;
+      let caret = insert.length;
+      if (prev === "{" || prev === "[") {
+        insert += INDENT;
+        caret = insert.length;
+        const closing = prev === "{" ? "}" : "]";
+        if (next === closing) insert += "\n" + indent;
+      }
+      setTextareaValue(ta, value.slice(0, s) + insert + value.slice(e), s + caret);
+    };
+    editor.addEventListener("keydown", (e) => {
+      if (e.key === "Tab") {
+        e.preventDefault();
+        handleTab(editor, e.shiftKey);
+      } else if (e.key === "Enter" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        handleEnter(editor);
+      }
+    });
+    updateHighlight();
 
     // ----- split resizer -----
     const applyRatio = (pct) => {
@@ -339,6 +455,7 @@
       if (!t) return;
       try {
         editor.value = toPretty(t);
+        updateHighlight();
         setStatus("formatted", "ok");
         if (activeView !== "raw") sendToJsoncrack(editor.value);
       } catch (err) {
@@ -371,6 +488,7 @@
       try {
         const txt = await navigator.clipboard.readText();
         editor.value = txt;
+        updateHighlight();
         validate();
       } catch (err) {
         setStatus(`clipboard: ${err.message}`, "err");
@@ -442,6 +560,7 @@
       } catch {
         editor.value = v;
       }
+      updateHighlight();
       setStatus(`loaded preset "${name}"`, "ok");
       if (activeView !== "raw") sendToJsoncrack(editor.value);
     };
