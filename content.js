@@ -208,6 +208,7 @@
             <button class="jsonpad-btn" data-act="validate">validate</button>
             <button class="jsonpad-btn" data-act="paste">paste from clipboard</button>
             <button class="jsonpad-btn" data-act="copy-prompt" title="copy a prompt template to ask AI for a schema/preset">copy AI prompt</button>
+            <button class="jsonpad-btn" data-act="open-jsoncrack-editor" title="copy JSON and open jsoncrack.com editor (paste with Ctrl/Cmd+V)">open in jsoncrack editor</button>
             <button class="jsonpad-btn" data-act="open-jsonhero" title="open in jsonhero.io with payload in URL (no server-side storage, URL stays in history)">open in JSON Hero</button>
           </div>
           <div class="jsonpad-right">
@@ -451,6 +452,22 @@
     presetSelect.addEventListener("change", (e) => applyPreset(e.target.value));
     refreshPresets();
 
+    const openInJsoncrackEditor = async () => {
+      const t = editor.value.trim();
+      if (!t) { setStatus("nothing to send", "err"); return; }
+      let pretty;
+      try { pretty = toPretty(t); }
+      catch (err) { setStatus(`invalid: ${err.message}`, "err"); return; }
+      try {
+        await navigator.clipboard.writeText(pretty);
+      } catch (err) {
+        setStatus(`clipboard: ${err.message}`, "err");
+        return;
+      }
+      window.open("https://jsoncrack.com/editor", "_blank", "noopener");
+      setStatus("copied — paste (Ctrl/Cmd+V) in the opened jsoncrack editor", "ok");
+    };
+
     const openInJsonHero = () => {
       const t = editor.value.trim();
       if (!t) { setStatus("nothing to send", "err"); return; }
@@ -485,6 +502,7 @@
         case "paste": pasteClipboard(); break;
         case "copy-prompt": copyPrompt(); break;
         case "save-preset": savePreset(); break;
+        case "open-jsoncrack-editor": openInJsoncrackEditor(); break;
         case "open-jsonhero": openInJsonHero(); break;
         case "sync": syncJsoncrack(); break;
       }

@@ -20,6 +20,7 @@
   - 헤더에서 `split` / `raw` / `jsoncrack` 3모드 전환
   - `raw` 만 편집 가능, `jsoncrack` 은 jsoncrack.com iframe 으로 읽기 전용 (데이터는 브라우저 밖으로 안 나감)
   - **sync** 버튼 또는 `Ctrl`/`Cmd` + `Shift` + `Enter` 로 현재 raw 를 그래프에 반영. 모달 열 때 · format 시 · 프리셋 로드 시 자동 sync
+- **Open in jsoncrack editor**: 현재 JSON 을 클립보드에 복사하고 [jsoncrack.com/editor](https://jsoncrack.com/editor) 를 새 탭으로 열기 (에디터에서 `Ctrl`/`Cmd` + `V` 로 붙여넣기. jsoncrack 은 URL prefill 을 지원하지 않음)
 - **Open in JSON Hero**: [jsonhero.io](https://jsonhero.io) 를 URL 에 base64 페이로드를 실어서 새 탭으로 열기 (서버 저장 없음, 다만 URL 은 브라우저 히스토리에 남고 서버 로그에 기록될 수 있음 · ~20k 자 제한)
 - 적용 시 **compact JSON** 으로 주입, `input` · `change` 이벤트 dispatch (React, Vue 등 프레임워크 state 반영)
 - 프리셋 저장 (`chrome.storage.local`)

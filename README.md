@@ -20,6 +20,7 @@ Admin tools often ship a form field whose "value" is a compact JSON blob. Editin
   - Switch between layouts from the header (`split` / `raw` / `jsoncrack`)
   - `raw` is the only editable pane; `jsoncrack` is read-only (via jsoncrack.com iframe, data stays in the browser)
   - Push the current raw content into the graph with the **sync** button or `Ctrl`/`Cmd` + `Shift` + `Enter`; auto-synced on modal open, on format, and when loading a preset
+- **Open in jsoncrack editor** copies the current JSON and opens the full [jsoncrack.com/editor](https://jsoncrack.com/editor) in a new tab (paste with `Ctrl`/`Cmd` + `V`; jsoncrack doesn't accept URL prefill)
 - **Open in JSON Hero** opens [jsonhero.io](https://jsonhero.io) with the payload base64-encoded in the URL (no server-side storage, but the URL stays in browser history and may appear in server logs; capped at ~20k chars)
 - Applies changes as **compact JSON** and dispatches `input` / `change` so framework state (React, Vue, etc.) updates correctly
 - Presets saved per-browser via `chrome.storage.local`
