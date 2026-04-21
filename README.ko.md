@@ -15,16 +15,18 @@
 - 값이 JSON 형태인 필드에 포커스하면 `{}` 트리거 노출
 - 트리거의 `×` 버튼으로 해당 필드만 숨김 (세션 한정)
 - `Alt` + `Shift` + `J` 로 아무 필드에서나 강제 오픈
-- 툴바 팝업: on/off 토글, 기본 뷰(`raw`/`jsoncrack`) 선택
-- 모달 에디터에서 pretty 포맷 / validate
-- **jsoncrack** 탭: [jsoncrack.com](https://jsoncrack.com) iframe 임베드 + `postMessage` 로 JSON 전달 (데이터는 브라우저 밖으로 안 나감)
+- 툴바 팝업: on/off 토글, 기본 레이아웃(`split` / `raw` / `jsoncrack`) 선택
+- 모달은 `raw` 에디터와 `jsoncrack` 그래프 뷰를 좌우로 같이 보여줌
+  - 헤더에서 `split` / `raw` / `jsoncrack` 3모드 전환
+  - `raw` 만 편집 가능, `jsoncrack` 은 jsoncrack.com iframe 으로 읽기 전용 (데이터는 브라우저 밖으로 안 나감)
+  - **sync** 버튼 또는 `Ctrl`/`Cmd` + `Shift` + `Enter` 로 현재 raw 를 그래프에 반영. 모달 열 때 · format 시 · 프리셋 로드 시 자동 sync
 - **Open in JSON Hero**: [jsonhero.io](https://jsonhero.io) 를 URL 에 base64 페이로드를 실어서 새 탭으로 열기 (서버 저장 없음, 다만 URL 은 브라우저 히스토리에 남고 서버 로그에 기록될 수 있음 · ~20k 자 제한)
 - 적용 시 **compact JSON** 으로 주입, `input` · `change` 이벤트 dispatch (React, Vue 등 프레임워크 state 반영)
 - 프리셋 저장 (`chrome.storage.local`)
 - 브릿지 · 데몬 없이 동작하는 AI 연동
   - **Copy AI prompt** — 현재 JSON 기반 프롬프트를 클립보드로 복사
   - **Paste from clipboard** — AI 출력을 바로 에디터에 붙여넣기
-- 모달 단축키: `Esc` 취소 · `Ctrl`/`Cmd` + `Enter` apply · `Ctrl`/`Cmd` + `S` format
+- 모달 단축키: `Esc` 취소 · `Ctrl`/`Cmd` + `Enter` apply · `Ctrl`/`Cmd` + `Shift` + `Enter` sync · `Ctrl`/`Cmd` + `S` format
 
 ## 설치 (개발자 모드)
 

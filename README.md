@@ -15,16 +15,18 @@ Admin tools often ship a form field whose "value" is a compact JSON blob. Editin
 - `{}` trigger appears when you focus a field whose value looks like JSON
 - `×` on the trigger hides it for that field (session only)
 - Force open on any field with `Alt` + `Shift` + `J`
-- Toolbar popup: enable / disable, pick default view (`raw` / `jsoncrack`)
-- Modal editor with formatting and validation
-- **jsoncrack** tab embeds [jsoncrack.com](https://jsoncrack.com) as a read-only graph viewer (iframe `postMessage`, data stays in the browser)
+- Toolbar popup: enable / disable, pick default layout (`split` / `raw` / `jsoncrack`)
+- Modal with `raw` editor and a `jsoncrack` graph view side by side
+  - Switch between layouts from the header (`split` / `raw` / `jsoncrack`)
+  - `raw` is the only editable pane; `jsoncrack` is read-only (via jsoncrack.com iframe, data stays in the browser)
+  - Push the current raw content into the graph with the **sync** button or `Ctrl`/`Cmd` + `Shift` + `Enter`; auto-synced on modal open, on format, and when loading a preset
 - **Open in JSON Hero** opens [jsonhero.io](https://jsonhero.io) with the payload base64-encoded in the URL (no server-side storage, but the URL stays in browser history and may appear in server logs; capped at ~20k chars)
 - Applies changes as **compact JSON** and dispatches `input` / `change` so framework state (React, Vue, etc.) updates correctly
 - Presets saved per-browser via `chrome.storage.local`
 - AI workflow without a bridge or daemon
   - **Copy AI prompt** — puts a ready-to-send prompt on your clipboard
   - **Paste from clipboard** — drops AI output straight into the editor
-- Modal shortcuts: `Esc` cancel · `Ctrl`/`Cmd` + `Enter` apply · `Ctrl`/`Cmd` + `S` format
+- Modal shortcuts: `Esc` cancel · `Ctrl`/`Cmd` + `Enter` apply · `Ctrl`/`Cmd` + `Shift` + `Enter` sync · `Ctrl`/`Cmd` + `S` format
 
 ## Install (developer mode)
 

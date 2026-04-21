@@ -2,7 +2,7 @@
   const checkbox = document.getElementById("enabled");
   const viewRadios = document.querySelectorAll('input[name="view"]');
 
-  const { enabled = true, defaultView = "raw" } = await chrome.storage.local.get(
+  const { enabled = true, defaultView = "split" } = await chrome.storage.local.get(
     ["enabled", "defaultView"]
   );
 

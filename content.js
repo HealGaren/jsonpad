@@ -180,10 +180,12 @@
       <div class="jsonpad-modal" role="dialog" aria-label="jsonpad">
         <div class="jsonpad-header">
           <div class="jsonpad-title">jsonpad</div>
-          <div class="jsonpad-tabs" role="tablist">
-            <button class="jsonpad-tab" data-tab="raw" role="tab">raw</button>
-            <button class="jsonpad-tab" data-tab="jsoncrack" role="tab" title="read-only graph viewer via jsoncrack.com iframe">jsoncrack</button>
+          <div class="jsonpad-views" role="group" aria-label="view mode">
+            <button class="jsonpad-view" data-view="split">split</button>
+            <button class="jsonpad-view" data-view="raw">raw</button>
+            <button class="jsonpad-view" data-view="jsoncrack">jsoncrack</button>
           </div>
+          <button class="jsonpad-btn" data-act="sync" title="push raw content to jsoncrack (Ctrl/Cmd+Shift+Enter)">sync →</button>
           <div class="jsonpad-presets">
             <select class="jsonpad-preset-select" aria-label="presets">
               <option value="">— preset —</option>
@@ -192,9 +194,9 @@
           </div>
           <button class="jsonpad-close" data-act="close" aria-label="close">×</button>
         </div>
-        <div class="jsonpad-body">
-          <textarea class="jsonpad-editor" spellcheck="false" data-pane="raw"></textarea>
-          <div class="jsonpad-viewer" data-pane="jsoncrack" hidden>
+        <div class="jsonpad-body" data-view="split">
+          <textarea class="jsonpad-editor jsonpad-pane" data-pane="raw" spellcheck="false"></textarea>
+          <div class="jsonpad-viewer jsonpad-pane" data-pane="jsoncrack">
             <iframe class="jsonpad-jsoncrack" src="https://jsoncrack.com/widget" title="jsoncrack"></iframe>
           </div>
         </div>
@@ -221,13 +223,13 @@
     const status = host.querySelector(".jsonpad-status");
     const presetSelect = host.querySelector(".jsonpad-preset-select");
     const iframe = host.querySelector(".jsonpad-jsoncrack");
-    const panes = host.querySelectorAll("[data-pane]");
-    const tabs = host.querySelectorAll(".jsonpad-tab");
+    const body = host.querySelector(".jsonpad-body");
+    const viewButtons = host.querySelectorAll(".jsonpad-view");
     editor.value = prettyInitial;
 
     let iframeReady = false;
     let lastPayload = null;
-    let activeTab = "raw";
+    let activeView = "split";
 
     const postPayload = () => {
       if (!lastPayload) return;
@@ -262,11 +264,14 @@
       setTimeout(postPayload, 1000);
     });
 
-    const setTab = (name) => {
-      activeTab = name;
-      for (const t of tabs) t.setAttribute("aria-selected", String(t.dataset.tab === name));
-      for (const p of panes) p.hidden = p.dataset.pane !== name;
-      if (name === "jsoncrack") sendToJsoncrack(editor.value);
+    const setView = (name) => {
+      if (!["split", "raw", "jsoncrack"].includes(name)) name = "split";
+      activeView = name;
+      body.setAttribute("data-view", name);
+      for (const b of viewButtons) {
+        b.setAttribute("aria-pressed", String(b.dataset.view === name));
+      }
+      if (name !== "raw") sendToJsoncrack(editor.value);
     };
 
     const setStatus = (msg, kind) => {
@@ -296,9 +301,15 @@
       try {
         editor.value = toPretty(t);
         setStatus("formatted", "ok");
+        if (activeView !== "raw") sendToJsoncrack(editor.value);
       } catch (err) {
         setStatus(`invalid: ${err.message}`, "err");
       }
+    };
+
+    const syncJsoncrack = () => {
+      sendToJsoncrack(editor.value);
+      setStatus("synced to jsoncrack", "ok");
     };
 
     const apply = () => {
@@ -393,6 +404,7 @@
         editor.value = v;
       }
       setStatus(`loaded preset "${name}"`, "ok");
+      if (activeView !== "raw") sendToJsoncrack(editor.value);
     };
 
     // use window.prompt but rename to avoid shadowing
@@ -422,8 +434,8 @@
 
     host.addEventListener("click", (e) => {
       if (e.target === host) { closeModal(); return; }
-      const tab = e.target.getAttribute && e.target.getAttribute("data-tab");
-      if (tab) { setTab(tab); return; }
+      const view = e.target.getAttribute && e.target.getAttribute("data-view");
+      if (view) { setView(view); return; }
       const act = e.target.getAttribute && e.target.getAttribute("data-act");
       if (!act) return;
       switch (act) {
@@ -436,21 +448,23 @@
         case "copy-prompt": copyPrompt(); break;
         case "save-preset": savePreset(); break;
         case "open-jsonhero": openInJsonHero(); break;
+        case "sync": syncJsoncrack(); break;
       }
     });
 
-    // Shortcuts: Cmd/Ctrl+Enter apply, Esc cancel, Cmd/Ctrl+S format
+    // Shortcuts: Cmd/Ctrl+Enter apply, Cmd/Ctrl+Shift+Enter sync, Esc cancel, Cmd/Ctrl+S format
     host.addEventListener("keydown", (e) => {
       const mod = e.metaKey || e.ctrlKey;
       if (e.key === "Escape") { e.preventDefault(); closeModal(); }
+      else if (mod && e.shiftKey && e.key === "Enter") { e.preventDefault(); syncJsoncrack(); }
       else if (mod && e.key === "Enter") { e.preventDefault(); apply(); }
       else if (mod && e.key.toLowerCase() === "s") { e.preventDefault(); format(); }
     });
 
     (async () => {
-      const { defaultView = "raw" } = await chrome.storage.local.get("defaultView");
-      setTab(defaultView === "jsoncrack" ? "jsoncrack" : "raw");
-      if (defaultView !== "jsoncrack") editor.focus();
+      const { defaultView = "split" } = await chrome.storage.local.get("defaultView");
+      setView(defaultView);
+      if (activeView !== "jsoncrack") editor.focus();
     })();
     validate();
 
