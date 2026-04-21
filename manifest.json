@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "jsonpad",
+  "version": "0.0.1",
+  "description": "Edit JSON stuck inside input/textarea fields via a pretty modal editor.",
+  "permissions": ["storage", "clipboardRead", "clipboardWrite"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["modal.css"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}
