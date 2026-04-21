@@ -205,7 +205,7 @@
             <button class="jsonpad-btn" data-act="validate">validate</button>
             <button class="jsonpad-btn" data-act="paste">paste from clipboard</button>
             <button class="jsonpad-btn" data-act="copy-prompt" title="copy a prompt template to ask AI for a schema/preset">copy AI prompt</button>
-            <button class="jsonpad-btn" data-act="open-jsonhero" title="upload to jsonhero.io and open in a new tab (data leaves your machine)">open in JSON Hero</button>
+            <button class="jsonpad-btn" data-act="open-jsonhero" title="open in jsonhero.io with payload in URL (no server-side storage, URL stays in history)">open in JSON Hero</button>
           </div>
           <div class="jsonpad-right">
             <button class="jsonpad-btn jsonpad-secondary" data-act="cancel">cancel</button>
@@ -401,29 +401,23 @@
     presetSelect.addEventListener("change", (e) => applyPreset(e.target.value));
     refreshPresets();
 
-    const openInJsonHero = async () => {
+    const openInJsonHero = () => {
       const t = editor.value.trim();
       if (!t) { setStatus("nothing to send", "err"); return; }
-      let parsed;
-      try { parsed = JSON.parse(t); }
+      let compact;
+      try { compact = JSON.stringify(JSON.parse(t)); }
       catch (err) { setStatus(`invalid: ${err.message}`, "err"); return; }
-      setStatus("uploading to JSON Hero…", "idle");
-      try {
-        const res = await chrome.runtime.sendMessage({
-          type: "jsonhero-create",
-          title: "jsonpad",
-          content: parsed,
-          ttl: 3600,
-        });
-        if (!res || !res.ok) {
-          setStatus(`JSON Hero: ${res && res.error || "failed"}`, "err");
-          return;
-        }
-        window.open(res.data.location, "_blank", "noopener");
-        setStatus("opened in JSON Hero (expires in 1h)", "ok");
-      } catch (err) {
-        setStatus(`JSON Hero: ${err.message}`, "err");
+      const bytes = new TextEncoder().encode(compact);
+      let bin = "";
+      for (const b of bytes) bin += String.fromCharCode(b);
+      const b64 = btoa(bin);
+      const url = `https://jsonhero.io/new?j=${encodeURIComponent(b64)}`;
+      if (url.length > 20000) {
+        setStatus("JSON too large for URL-based JSON Hero (> ~20k chars)", "err");
+        return;
       }
+      window.open(url, "_blank", "noopener");
+      setStatus("opened in JSON Hero", "ok");
     };
 
     host.addEventListener("click", (e) => {

@@ -18,7 +18,7 @@
 - 툴바 팝업: on/off 토글, 기본 뷰(`raw`/`jsoncrack`) 선택
 - 모달 에디터에서 pretty 포맷 / validate
 - **jsoncrack** 탭: [jsoncrack.com](https://jsoncrack.com) iframe 임베드 + `postMessage` 로 JSON 전달 (데이터는 브라우저 밖으로 안 나감)
-- **Open in JSON Hero**: 현재 JSON 을 [jsonhero.io](https://jsonhero.io) 에 1시간 TTL 로 업로드 후 새 탭에서 열기 (외부 업로드 발생 — 민감 데이터 금지)
+- **Open in JSON Hero**: [jsonhero.io](https://jsonhero.io) 를 URL 에 base64 페이로드를 실어서 새 탭으로 열기 (서버 저장 없음, 다만 URL 은 브라우저 히스토리에 남고 서버 로그에 기록될 수 있음 · ~20k 자 제한)
 - 적용 시 **compact JSON** 으로 주입, `input` · `change` 이벤트 dispatch (React, Vue 등 프레임워크 state 반영)
 - 프리셋 저장 (`chrome.storage.local`)
 - 브릿지 · 데몬 없이 동작하는 AI 연동
@@ -65,7 +65,6 @@ manifest.json   MV3 매니페스트
 content.js      감지 · 모달 · 저장 로직
 modal.css       오버레이 · 모달 스타일
 popup.html/js   툴바 팝업 (on/off · 기본 뷰)
-background.js   서비스 워커 (JSON Hero 업로드 릴레이)
 ```
 
 의존성 없음. 번들러 없음. 파일 수정 후 `chrome://extensions` 에서 **새로고침**.

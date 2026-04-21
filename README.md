@@ -18,7 +18,7 @@ Admin tools often ship a form field whose "value" is a compact JSON blob. Editin
 - Toolbar popup: enable / disable, pick default view (`raw` / `jsoncrack`)
 - Modal editor with formatting and validation
 - **jsoncrack** tab embeds [jsoncrack.com](https://jsoncrack.com) as a read-only graph viewer (iframe `postMessage`, data stays in the browser)
-- **Open in JSON Hero** uploads the current JSON to [jsonhero.io](https://jsonhero.io) with a 1-hour TTL and opens the result in a new tab (data leaves your machine — don't use for sensitive payloads)
+- **Open in JSON Hero** opens [jsonhero.io](https://jsonhero.io) with the payload base64-encoded in the URL (no server-side storage, but the URL stays in browser history and may appear in server logs; capped at ~20k chars)
 - Applies changes as **compact JSON** and dispatches `input` / `change` so framework state (React, Vue, etc.) updates correctly
 - Presets saved per-browser via `chrome.storage.local`
 - AI workflow without a bridge or daemon
@@ -65,7 +65,6 @@ manifest.json   MV3 manifest
 content.js      detection, modal, storage
 modal.css       overlay and modal styles
 popup.html/js   toolbar popup (enable / default view)
-background.js   service worker (JSON Hero upload relay)
 ```
 
 No dependencies, no bundler. Edit files and hit **Reload** in `chrome://extensions`.
