@@ -180,13 +180,15 @@
       <div class="jsonpad-modal" role="dialog" aria-label="jsonpad">
         <div class="jsonpad-header">
           <div class="jsonpad-title">jsonpad</div>
-          <div class="jsonpad-views" role="group" aria-label="view mode">
-            <button class="jsonpad-view" data-view="split">split</button>
-            <button class="jsonpad-view" data-view="raw">raw</button>
-            <button class="jsonpad-view" data-view="jsoncrack">jsoncrack</button>
+          <div class="jsonpad-group">
+            <div class="jsonpad-views" role="group" aria-label="view mode">
+              <button class="jsonpad-view" data-view="split">split</button>
+              <button class="jsonpad-view" data-view="raw">raw</button>
+              <button class="jsonpad-view" data-view="jsoncrack">jsoncrack</button>
+            </div>
+            <button class="jsonpad-btn" data-act="sync" title="push raw content to jsoncrack (Ctrl/Cmd+Shift+Enter)">sync →</button>
           </div>
-          <button class="jsonpad-btn" data-act="sync" title="push raw content to jsoncrack (Ctrl/Cmd+Shift+Enter)">sync →</button>
-          <div class="jsonpad-presets">
+          <div class="jsonpad-group jsonpad-presets">
             <select class="jsonpad-preset-select" aria-label="presets">
               <option value="">— preset —</option>
             </select>
@@ -204,16 +206,22 @@
         <div class="jsonpad-status" data-status="idle"></div>
         <div class="jsonpad-footer">
           <div class="jsonpad-left">
-            <button class="jsonpad-btn" data-act="format" title="pretty-print (Ctrl/Cmd+S)">format</button>
-            <button class="jsonpad-btn" data-act="validate">validate</button>
-            <button class="jsonpad-btn" data-act="paste">paste from clipboard</button>
-            <button class="jsonpad-btn" data-act="copy-prompt" title="copy a prompt template to ask AI for a schema/preset">copy AI prompt</button>
-            <button class="jsonpad-btn" data-act="open-jsoncrack-editor" title="copy JSON and open jsoncrack.com editor (paste with Ctrl/Cmd+V)">open in jsoncrack editor</button>
-            <button class="jsonpad-btn" data-act="open-jsonhero" title="open in jsonhero.io with payload in URL (no server-side storage, URL stays in history)">open in JSON Hero</button>
+            <div class="jsonpad-group" aria-label="edit">
+              <button class="jsonpad-btn" data-act="format" title="pretty-print (Ctrl/Cmd+S)">format</button>
+              <button class="jsonpad-btn" data-act="validate">validate</button>
+            </div>
+            <div class="jsonpad-group" aria-label="clipboard">
+              <button class="jsonpad-btn" data-act="paste" title="paste clipboard contents into the editor">paste</button>
+              <button class="jsonpad-btn" data-act="copy-prompt" title="copy a prompt template to ask AI for a schema/preset">copy AI prompt</button>
+            </div>
+            <div class="jsonpad-group jsonpad-group--external" aria-label="open externally">
+              <button class="jsonpad-btn jsonpad-btn--external" data-act="open-jsoncrack-editor" title="copy JSON and open jsoncrack.com editor (paste with Ctrl/Cmd+V)"><span class="jsonpad-ext-arrow">↗</span> jsoncrack</button>
+              <button class="jsonpad-btn jsonpad-btn--external" data-act="open-jsonhero" title="open in jsonhero.io with payload in URL (no server-side storage, URL stays in history)"><span class="jsonpad-ext-arrow">↗</span> JSON Hero</button>
+            </div>
           </div>
           <div class="jsonpad-right">
             <button class="jsonpad-btn jsonpad-secondary" data-act="cancel">cancel</button>
-            <button class="jsonpad-btn jsonpad-primary" data-act="apply">apply</button>
+            <button class="jsonpad-btn jsonpad-primary" data-act="apply" title="apply (Ctrl/Cmd+Enter)">apply</button>
           </div>
         </div>
       </div>

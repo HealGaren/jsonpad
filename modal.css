@@ -54,10 +54,15 @@
 .jsonpad-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 10px 12px;
   border-bottom: 1px solid #e2e8f0;
   background: #f8fafc;
+}
+.jsonpad-header .jsonpad-group {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
 }
 .jsonpad-title {
   font-weight: 700;
@@ -185,7 +190,38 @@
   border-top: 1px solid #e2e8f0;
   background: #f8fafc;
 }
-.jsonpad-left, .jsonpad-right { display: flex; gap: 6px; flex-wrap: wrap; }
+.jsonpad-left {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+}
+.jsonpad-right { display: flex; gap: 6px; flex-wrap: wrap; }
+.jsonpad-footer .jsonpad-group {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 0 12px;
+}
+.jsonpad-footer .jsonpad-group:first-child { padding-left: 0; }
+.jsonpad-footer .jsonpad-group + .jsonpad-group {
+  border-left: 1px solid #e2e8f0;
+}
+.jsonpad-btn--external {
+  color: #475569;
+  background: #f8fafc;
+}
+.jsonpad-btn--external:hover {
+  background: #eef2ff;
+  color: #1e293b;
+}
+.jsonpad-ext-arrow {
+  display: inline-block;
+  font-weight: 600;
+  color: #64748b;
+  margin-right: 2px;
+}
+.jsonpad-btn--external:hover .jsonpad-ext-arrow { color: #4f46e5; }
 .jsonpad-btn {
   font: inherit;
   padding: 5px 10px;
