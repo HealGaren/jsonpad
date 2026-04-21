@@ -195,7 +195,7 @@
           <button class="jsonpad-close" data-act="close" aria-label="close">×</button>
         </div>
         <div class="jsonpad-body" data-view="split">
-          <textarea class="jsonpad-editor jsonpad-pane" data-pane="raw" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+          <textarea class="jsonpad-editor jsonpad-pane" data-pane="raw" spellcheck="false" wrap="off" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
           <div class="jsonpad-resizer" role="separator" aria-orientation="vertical" title="drag to resize"></div>
           <div class="jsonpad-viewer jsonpad-pane" data-pane="jsoncrack">
             <iframe class="jsonpad-jsoncrack" src="https://jsoncrack.com/widget" title="jsoncrack"></iframe>
@@ -599,7 +599,10 @@
     });
 
     (async () => {
-      const { defaultView = "split" } = await chrome.storage.local.get("defaultView");
+      const { defaultView = "split", wordWrap = false } = await chrome.storage.local.get(
+        ["defaultView", "wordWrap"]
+      );
+      editor.setAttribute("wrap", wordWrap ? "soft" : "off");
       setView(defaultView);
       if (activeView !== "jsoncrack") editor.focus();
     })();

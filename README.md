@@ -15,7 +15,7 @@ Admin tools often ship a form field whose "value" is a compact JSON blob. Editin
 - `{}` trigger appears when you focus a field whose value looks like JSON
 - `×` on the trigger hides it for that field (session only)
 - Force open on any field with `Alt` + `Shift` + `J`
-- Toolbar popup: enable / disable, pick default layout (`split` / `raw` / `jsoncrack`)
+- Toolbar popup: enable / disable, pick default layout (`split` / `raw` / `jsoncrack`), toggle word-wrap in the raw editor
 - Modal with `raw` editor and a `jsoncrack` graph view side by side
   - `raw` editor has auto-indent on `Enter`, and `Tab` / `Shift` + `Tab` to indent/dedent the current line or the multi-line selection (syntax highlighting is deferred to v1 with a proper editor library)
   - Switch between layouts from the header (`split` / `raw` / `jsoncrack`)
