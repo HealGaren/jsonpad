@@ -1,51 +1,68 @@
 # jsonpad
 
-어드민 페이지처럼 `<input>` / `<textarea>` 안에 JSON 을 박아 넣어야 하는 상황에서,
-원본은 compact 로 유지하면서 편집할 때만 pretty 모달을 띄워 다루기 위한 Chrome 확장 프로그램.
+A Chrome extension for editing JSON stuck inside `<input>` and `<textarea>` fields. Pops a real editor when you need it, writes back compact JSON so the form never changes shape.
 
-현재 **PoC** 단계.
+Status: **proof of concept**.
 
-## 기능 (PoC)
+> Language: **English** · [한국어](README.ko.md)
 
-- `input` / `textarea` 포커스 시 우측 상단에 `{}` 버튼 표시
-- 버튼 클릭 → 모달에서 pretty 편집
-- format / validate / apply (apply 시 원본에 **compact JSON** 으로 주입 + `input`·`change` 이벤트 dispatch)
-- 프리셋 저장/적용 (`chrome.storage.local`)
-- AI 연동(복붙 기반):
-  - "copy AI prompt" — 현재 JSON 기반 스키마·프리셋 생성 프롬프트 클립보드 복사
-  - "paste from clipboard" — AI 가 생성한 JSON 을 에디터에 붙여넣기
-- 키보드 단축키: `Esc` 취소 / `Cmd·Ctrl+Enter` apply / `Cmd·Ctrl+S` format
+## Why
 
-## 설치 (개발자 모드)
+Admin tools often ship a form field whose "value" is a compact JSON blob. Editing in place means squinting at one long line, losing track of brackets, and hoping your change still parses. jsonpad gives you a real editor on demand without changing what the form submits.
 
-1. 이 저장소 클론
-2. Chrome → `chrome://extensions`
-3. 우측 상단 "개발자 모드" 켜기
-4. "압축해제된 확장 프로그램 로드" → 이 디렉터리 선택
+## Features
 
-## 로드맵
+- `{}` trigger appears when you focus an `<input>` or `<textarea>`
+- Modal editor with formatting and validation
+- Applies changes as **compact JSON** and dispatches `input` / `change` so framework state (React, Vue, etc.) updates correctly
+- Presets saved per-browser via `chrome.storage.local`
+- AI workflow without a bridge or daemon
+  - **Copy AI prompt** — puts a ready-to-send prompt on your clipboard
+  - **Paste from clipboard** — drops AI output straight into the editor
+- Keyboard shortcuts: `Esc` cancel · `Ctrl`/`Cmd` + `Enter` apply · `Ctrl`/`Cmd` + `S` format
 
-**v1 (리뉴얼)**
-- 트리 뷰 / jsonhero 스타일 구조화 뷰
-- 스키마 저장 및 스키마 기반 폼 뷰
-- DOM 패턴(XPath 등) 기반 필드별 스키마 자동 추천/적용
-- Diff 뷰, 세션 내 undo 히스토리
-- 경로 breadcrumb, JSON 내 검색
-- 서브트리 복사 (값 / JSONPath)
-- 관대한 파서 (trailing comma, single quote, unquoted key 자동 수정 제안)
-- 확장 프레임워크·보일러플레이트(CRXJS, wxt 등) 도입 검토
+## Install (developer mode)
 
-**아이디어 (실현 미정)**
-- 로컬 HTTP 브릿지(선택 설치)를 통한 AI 직접 연동
-  - AI → `curl POST` → 확장으로 스키마/프리셋 실시간 푸시
-  - 확장 → AI 에게 노출할 추천 프롬프트 큐잉
+1. Clone this repo
+2. Open `chrome://extensions`
+3. Enable **Developer mode**
+4. Click **Load unpacked** and select the repo folder
 
-## 구조
+A packaged Web Store build will come with v1.
+
+## Usage
+
+Focus any `<input>` or `<textarea>`. A small `{}` button appears at the top-right of the field. Click it, edit, apply. The original field gets compact JSON back.
+
+## Roadmap
+
+**v1**
+
+- Tree / structured view (jsonhero-style)
+- Schema save + schema-driven form view
+- Per-field schema suggestions from DOM patterns (XPath etc.)
+- Diff view against the original value
+- Session undo history, path breadcrumb, in-JSON search
+- Subtree copy (value or JSONPath)
+- Lenient parser: trailing commas, single quotes, unquoted keys
+- Revisit tooling: an extension boilerplate (CRXJS, wxt) may land with the rewrite
+
+**Ideas (not committed)**
+
+- Optional local HTTP bridge for AI integration
+  - AI pushes schemas and presets via `curl POST`
+  - Extension surfaces suggested prompts back to the AI side
+
+## Project layout
 
 ```
-manifest.json   # MV3 매니페스트
-content.js      # 감지·모달·저장 로직 전부
-modal.css       # 오버레이/모달 스타일
+manifest.json   MV3 manifest
+content.js      detection, modal, storage
+modal.css       overlay and modal styles
 ```
 
-의존성 없음. 번들러 없음. 파일 수정 후 `chrome://extensions` 에서 새로고침.
+No dependencies, no bundler. Edit files and hit **Reload** in `chrome://extensions`.
+
+## License
+
+TBD
