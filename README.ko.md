@@ -14,7 +14,7 @@
 
 - 값이 JSON 형태인 필드에 포커스하면 `{}` 트리거 노출
 - 트리거의 `×` 버튼으로 해당 필드만 숨김 (세션 한정)
-- `Ctrl`/`Cmd` + `Shift` + `J` 로 아무 필드에서나 강제 오픈
+- `Alt` + `Shift` + `J` 로 아무 필드에서나 강제 오픈
 - 툴바 팝업에서 확장 전역 on/off 토글
 - 모달 에디터에서 pretty 포맷 / validate
 - 적용 시 **compact JSON** 으로 주입, `input` · `change` 이벤트 dispatch (React, Vue 등 프레임워크 state 반영)

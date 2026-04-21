@@ -85,7 +85,7 @@
     openBtn.type = "button";
     openBtn.className = "jsonpad-trigger";
     openBtn.textContent = "{}";
-    openBtn.title = "jsonpad: edit JSON (Ctrl/Cmd+Shift+J)";
+    openBtn.title = "jsonpad: edit JSON (Alt+Shift+J)";
 
     const dismissBtn = document.createElement("button");
     dismissBtn.type = "button";
@@ -130,9 +130,8 @@
 
   const onKeyDown = (e) => {
     if (!enabled || modalHost) return;
-    const mod = e.metaKey || e.ctrlKey;
-    if (!mod || !e.shiftKey) return;
-    if (e.key.toLowerCase() !== "j") return;
+    if (!e.altKey || !e.shiftKey) return;
+    if (e.code !== "KeyJ") return;
     const el = document.activeElement;
     if (!isEditableTarget(el)) return;
     e.preventDefault();

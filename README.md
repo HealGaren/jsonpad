@@ -14,7 +14,7 @@ Admin tools often ship a form field whose "value" is a compact JSON blob. Editin
 
 - `{}` trigger appears when you focus a field whose value looks like JSON
 - `×` on the trigger hides it for that field (session only)
-- Force open on any field with `Ctrl`/`Cmd` + `Shift` + `J`
+- Force open on any field with `Alt` + `Shift` + `J`
 - Toolbar popup to enable / disable the extension globally
 - Modal editor with formatting and validation
 - Applies changes as **compact JSON** and dispatches `input` / `change` so framework state (React, Vue, etc.) updates correctly
