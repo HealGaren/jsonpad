@@ -197,7 +197,7 @@
         <div class="jsonpad-body" data-view="split">
           <div class="jsonpad-pane jsonpad-editor-wrap" data-pane="raw">
             <pre class="jsonpad-highlight" aria-hidden="true"><code></code></pre>
-            <textarea class="jsonpad-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+            <textarea class="jsonpad-editor" spellcheck="false" wrap="off" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
           </div>
           <div class="jsonpad-resizer" role="separator" aria-orientation="vertical" title="drag to resize"></div>
           <div class="jsonpad-viewer jsonpad-pane" data-pane="jsoncrack">
