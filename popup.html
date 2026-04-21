@@ -7,7 +7,7 @@
       body {
         margin: 0;
         padding: 14px 16px;
-        width: 240px;
+        width: 260px;
         font: 13px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         color: #0f172a;
       }
@@ -17,7 +17,7 @@
         margin: 0 0 10px;
         letter-spacing: 0.02em;
       }
-      label.toggle {
+      .row {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -26,11 +26,35 @@
         border: 1px solid #e2e8f0;
         border-radius: 6px;
         background: #f8fafc;
+        margin-bottom: 8px;
+      }
+      .row.toggle { cursor: pointer; }
+      .row input[type="checkbox"] { transform: scale(1.2); }
+      .section-label {
+        display: block;
+        font-size: 11px;
+        color: #64748b;
+        margin: 10px 0 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .radios {
+        display: flex;
+        gap: 6px;
+      }
+      .radios label {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 8px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        background: #f8fafc;
         cursor: pointer;
+        font-size: 12px;
       }
-      label.toggle input {
-        transform: scale(1.2);
-      }
+      .radios input { margin: 0; }
       .hint {
         margin-top: 10px;
         font-size: 11px;
@@ -50,10 +74,17 @@
   </head>
   <body>
     <h1>jsonpad</h1>
-    <label class="toggle">
+    <label class="row toggle">
       <span>Enabled</span>
       <input type="checkbox" id="enabled" />
     </label>
+
+    <span class="section-label">Default view</span>
+    <div class="radios">
+      <label><input type="radio" name="view" value="raw" />raw</label>
+      <label><input type="radio" name="view" value="jsoncrack" />jsoncrack</label>
+    </div>
+
     <div class="hint">
       Focus an <code>input</code> / <code>textarea</code> with JSON to see the
       <code>{}</code> trigger. Force open on any field with

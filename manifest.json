@@ -8,7 +8,14 @@
     "default_title": "jsonpad",
     "default_popup": "popup.html"
   },
-  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "<all_urls>",
+    "https://jsonhero.io/*",
+    "https://jsoncrack.com/*"
+  ],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

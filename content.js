@@ -180,6 +180,10 @@
       <div class="jsonpad-modal" role="dialog" aria-label="jsonpad">
         <div class="jsonpad-header">
           <div class="jsonpad-title">jsonpad</div>
+          <div class="jsonpad-tabs" role="tablist">
+            <button class="jsonpad-tab" data-tab="raw" role="tab">raw</button>
+            <button class="jsonpad-tab" data-tab="jsoncrack" role="tab" title="read-only graph viewer via jsoncrack.com iframe">jsoncrack</button>
+          </div>
           <div class="jsonpad-presets">
             <select class="jsonpad-preset-select" aria-label="presets">
               <option value="">— preset —</option>
@@ -188,7 +192,12 @@
           </div>
           <button class="jsonpad-close" data-act="close" aria-label="close">×</button>
         </div>
-        <textarea class="jsonpad-editor" spellcheck="false"></textarea>
+        <div class="jsonpad-body">
+          <textarea class="jsonpad-editor" spellcheck="false" data-pane="raw"></textarea>
+          <div class="jsonpad-viewer" data-pane="jsoncrack" hidden>
+            <iframe class="jsonpad-jsoncrack" src="https://jsoncrack.com/widget" title="jsoncrack"></iframe>
+          </div>
+        </div>
         <div class="jsonpad-status" data-status="idle"></div>
         <div class="jsonpad-footer">
           <div class="jsonpad-left">
@@ -196,6 +205,7 @@
             <button class="jsonpad-btn" data-act="validate">validate</button>
             <button class="jsonpad-btn" data-act="paste">paste from clipboard</button>
             <button class="jsonpad-btn" data-act="copy-prompt" title="copy a prompt template to ask AI for a schema/preset">copy AI prompt</button>
+            <button class="jsonpad-btn" data-act="open-jsonhero" title="upload to jsonhero.io and open in a new tab (data leaves your machine)">open in JSON Hero</button>
           </div>
           <div class="jsonpad-right">
             <button class="jsonpad-btn jsonpad-secondary" data-act="cancel">cancel</button>
@@ -210,7 +220,51 @@
     const editor = host.querySelector(".jsonpad-editor");
     const status = host.querySelector(".jsonpad-status");
     const presetSelect = host.querySelector(".jsonpad-preset-select");
+    const iframe = host.querySelector(".jsonpad-jsoncrack");
+    const panes = host.querySelectorAll("[data-pane]");
+    const tabs = host.querySelectorAll(".jsonpad-tab");
     editor.value = prettyInitial;
+
+    let iframeReady = false;
+    let pendingPayload = null;
+    let activeTab = "raw";
+
+    const sendToJsoncrack = (text) => {
+      let payload;
+      try {
+        payload = JSON.stringify(JSON.parse(text));
+      } catch {
+        payload = text || "{}";
+      }
+      const msg = {
+        json: payload,
+        options: { theme: "dark", direction: "RIGHT" },
+      };
+      if (iframeReady) {
+        iframe.contentWindow.postMessage(msg, "*");
+      } else {
+        pendingPayload = msg;
+      }
+    };
+
+    const onWindowMessage = (ev) => {
+      if (ev.source !== iframe.contentWindow) return;
+      if (ev.data === "json-crack-embed") {
+        iframeReady = true;
+        if (pendingPayload) {
+          iframe.contentWindow.postMessage(pendingPayload, "*");
+          pendingPayload = null;
+        }
+      }
+    };
+    window.addEventListener("message", onWindowMessage);
+
+    const setTab = (name) => {
+      activeTab = name;
+      for (const t of tabs) t.setAttribute("aria-selected", String(t.dataset.tab === name));
+      for (const p of panes) p.hidden = p.dataset.pane !== name;
+      if (name === "jsoncrack") sendToJsoncrack(editor.value);
+    };
 
     const setStatus = (msg, kind) => {
       status.textContent = msg || "";
@@ -344,8 +398,35 @@
     presetSelect.addEventListener("change", (e) => applyPreset(e.target.value));
     refreshPresets();
 
+    const openInJsonHero = async () => {
+      const t = editor.value.trim();
+      if (!t) { setStatus("nothing to send", "err"); return; }
+      let parsed;
+      try { parsed = JSON.parse(t); }
+      catch (err) { setStatus(`invalid: ${err.message}`, "err"); return; }
+      setStatus("uploading to JSON Hero…", "idle");
+      try {
+        const res = await chrome.runtime.sendMessage({
+          type: "jsonhero-create",
+          title: "jsonpad",
+          content: parsed,
+          ttl: 3600,
+        });
+        if (!res || !res.ok) {
+          setStatus(`JSON Hero: ${res && res.error || "failed"}`, "err");
+          return;
+        }
+        window.open(res.data.location, "_blank", "noopener");
+        setStatus("opened in JSON Hero (expires in 1h)", "ok");
+      } catch (err) {
+        setStatus(`JSON Hero: ${err.message}`, "err");
+      }
+    };
+
     host.addEventListener("click", (e) => {
       if (e.target === host) { closeModal(); return; }
+      const tab = e.target.getAttribute && e.target.getAttribute("data-tab");
+      if (tab) { setTab(tab); return; }
       const act = e.target.getAttribute && e.target.getAttribute("data-act");
       if (!act) return;
       switch (act) {
@@ -357,6 +438,7 @@
         case "paste": pasteClipboard(); break;
         case "copy-prompt": copyPrompt(); break;
         case "save-preset": savePreset(); break;
+        case "open-jsonhero": openInJsonHero(); break;
       }
     });
 
@@ -368,12 +450,20 @@
       else if (mod && e.key.toLowerCase() === "s") { e.preventDefault(); format(); }
     });
 
-    setTimeout(() => editor.focus(), 0);
+    (async () => {
+      const { defaultView = "raw" } = await chrome.storage.local.get("defaultView");
+      setTab(defaultView === "jsoncrack" ? "jsoncrack" : "raw");
+      if (defaultView !== "jsoncrack") editor.focus();
+    })();
     validate();
+
+    // Stash for teardown
+    host._jsonpadCleanup = () => window.removeEventListener("message", onWindowMessage);
   };
 
   const closeModal = () => {
     if (modalHost) {
+      if (typeof modalHost._jsonpadCleanup === "function") modalHost._jsonpadCleanup();
       modalHost.remove();
       modalHost = null;
     }
