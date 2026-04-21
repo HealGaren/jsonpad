@@ -12,14 +12,17 @@ Admin tools often ship a form field whose "value" is a compact JSON blob. Editin
 
 ## Features
 
-- `{}` trigger appears when you focus an `<input>` or `<textarea>`
+- `{}` trigger appears when you focus a field whose value looks like JSON
+- `×` on the trigger hides it for that field (session only)
+- Force open on any field with `Ctrl`/`Cmd` + `Shift` + `J`
+- Toolbar popup to enable / disable the extension globally
 - Modal editor with formatting and validation
 - Applies changes as **compact JSON** and dispatches `input` / `change` so framework state (React, Vue, etc.) updates correctly
 - Presets saved per-browser via `chrome.storage.local`
 - AI workflow without a bridge or daemon
   - **Copy AI prompt** — puts a ready-to-send prompt on your clipboard
   - **Paste from clipboard** — drops AI output straight into the editor
-- Keyboard shortcuts: `Esc` cancel · `Ctrl`/`Cmd` + `Enter` apply · `Ctrl`/`Cmd` + `S` format
+- Modal shortcuts: `Esc` cancel · `Ctrl`/`Cmd` + `Enter` apply · `Ctrl`/`Cmd` + `S` format
 
 ## Install (developer mode)
 
@@ -59,6 +62,7 @@ Focus any `<input>` or `<textarea>`. A small `{}` button appears at the top-righ
 manifest.json   MV3 manifest
 content.js      detection, modal, storage
 modal.css       overlay and modal styles
+popup.html/js   toolbar popup (enable / disable)
 ```
 
 No dependencies, no bundler. Edit files and hit **Reload** in `chrome://extensions`.

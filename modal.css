@@ -1,19 +1,34 @@
-.jsonpad-trigger {
+.jsonpad-trigger-wrap {
   position: absolute;
   z-index: 2147483646;
-  width: 24px;
+  display: inline-flex;
+  gap: 2px;
+  opacity: 0.85;
+}
+.jsonpad-trigger-wrap:hover { opacity: 1; }
+.jsonpad-trigger,
+.jsonpad-trigger-dismiss {
   height: 20px;
   padding: 0;
   font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   color: #fff;
-  background: #4f46e5;
   border: 1px solid #3730a3;
   border-radius: 4px;
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-  opacity: 0.85;
 }
-.jsonpad-trigger:hover { opacity: 1; }
+.jsonpad-trigger {
+  width: 26px;
+  background: #4f46e5;
+}
+.jsonpad-trigger:hover { background: #4338ca; }
+.jsonpad-trigger-dismiss {
+  width: 18px;
+  background: #64748b;
+  border-color: #475569;
+  font-size: 13px;
+}
+.jsonpad-trigger-dismiss:hover { background: #475569; }
 
 .jsonpad-overlay {
   position: fixed;

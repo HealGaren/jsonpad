@@ -2,14 +2,31 @@
   const BUTTON_ATTR = "data-jsonpad-button";
   const HOST_ATTR = "data-jsonpad-host";
 
+  let enabled = true;
   let currentTarget = null;
   let currentButton = null;
   let modalHost = null;
+  const dismissedFields = new WeakSet();
+
+  chrome.storage.local.get("enabled").then((res) => {
+    enabled = res.enabled !== false;
+    if (!enabled) removeButton();
+  });
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area !== "local" || !changes.enabled) return;
+    enabled = changes.enabled.newValue !== false;
+    if (!enabled) {
+      if (modalHost) closeModal();
+      removeButton();
+    } else if (document.activeElement && isEditableTarget(document.activeElement)) {
+      maybeShowButton(document.activeElement);
+    }
+  });
 
   const looksLikeJSON = (s) => {
     if (typeof s !== "string") return false;
     const t = s.trim();
-    if (!t) return true; // empty is fine — user may want to start writing JSON
+    if (!t) return false;
     return (t.startsWith("{") && t.endsWith("}")) ||
            (t.startsWith("[") && t.endsWith("]"));
   };
@@ -46,8 +63,9 @@
 
   const positionButton = (btn, target) => {
     const rect = target.getBoundingClientRect();
+    const width = btn.offsetWidth || 50;
     btn.style.top = `${window.scrollY + rect.top + 4}px`;
-    btn.style.left = `${window.scrollX + rect.right - 28}px`;
+    btn.style.left = `${window.scrollX + rect.right - width - 4}px`;
   };
 
   const removeButton = () => {
@@ -59,31 +77,70 @@
 
   const showButton = (target) => {
     removeButton();
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.setAttribute(BUTTON_ATTR, "1");
-    btn.className = "jsonpad-trigger";
-    btn.textContent = "{}";
-    btn.title = "jsonpad: edit JSON";
-    btn.addEventListener("mousedown", (e) => {
-      // prevent focus loss on target
-      e.preventDefault();
-    });
-    btn.addEventListener("click", (e) => {
+    const wrap = document.createElement("div");
+    wrap.setAttribute(BUTTON_ATTR, "1");
+    wrap.className = "jsonpad-trigger-wrap";
+
+    const openBtn = document.createElement("button");
+    openBtn.type = "button";
+    openBtn.className = "jsonpad-trigger";
+    openBtn.textContent = "{}";
+    openBtn.title = "jsonpad: edit JSON (Ctrl/Cmd+Shift+J)";
+
+    const dismissBtn = document.createElement("button");
+    dismissBtn.type = "button";
+    dismissBtn.className = "jsonpad-trigger-dismiss";
+    dismissBtn.textContent = "×";
+    dismissBtn.title = "hide for this field";
+
+    const preventBlur = (e) => e.preventDefault();
+    openBtn.addEventListener("mousedown", preventBlur);
+    dismissBtn.addEventListener("mousedown", preventBlur);
+
+    openBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       openModal(target);
     });
-    document.body.appendChild(btn);
-    positionButton(btn, target);
-    currentButton = btn;
+    dismissBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      dismissedFields.add(target);
+      removeButton();
+    });
+
+    wrap.appendChild(openBtn);
+    wrap.appendChild(dismissBtn);
+    document.body.appendChild(wrap);
+    positionButton(wrap, target);
+    currentButton = wrap;
+  };
+
+  const maybeShowButton = (target) => {
+    if (!enabled) return;
+    if (dismissedFields.has(target)) return;
+    if (!looksLikeJSON(getValue(target))) return;
+    showButton(target);
   };
 
   const onFocusIn = (e) => {
     const el = e.target;
     if (!isEditableTarget(el)) return;
     currentTarget = el;
-    showButton(el);
+    maybeShowButton(el);
   };
+
+  const onKeyDown = (e) => {
+    if (!enabled || modalHost) return;
+    const mod = e.metaKey || e.ctrlKey;
+    if (!mod || !e.shiftKey) return;
+    if (e.key.toLowerCase() !== "j") return;
+    const el = document.activeElement;
+    if (!isEditableTarget(el)) return;
+    e.preventDefault();
+    dismissedFields.delete(el);
+    currentTarget = el;
+    openModal(el);
+  };
+  document.addEventListener("keydown", onKeyDown, true);
 
   const onFocusOut = (e) => {
     // Delay so click on button registers

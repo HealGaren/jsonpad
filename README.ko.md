@@ -12,14 +12,17 @@
 
 ## 기능
 
-- `<input>` · `<textarea>` 포커스 시 `{}` 트리거 노출
+- 값이 JSON 형태인 필드에 포커스하면 `{}` 트리거 노출
+- 트리거의 `×` 버튼으로 해당 필드만 숨김 (세션 한정)
+- `Ctrl`/`Cmd` + `Shift` + `J` 로 아무 필드에서나 강제 오픈
+- 툴바 팝업에서 확장 전역 on/off 토글
 - 모달 에디터에서 pretty 포맷 / validate
 - 적용 시 **compact JSON** 으로 주입, `input` · `change` 이벤트 dispatch (React, Vue 등 프레임워크 state 반영)
 - 프리셋 저장 (`chrome.storage.local`)
 - 브릿지 · 데몬 없이 동작하는 AI 연동
   - **Copy AI prompt** — 현재 JSON 기반 프롬프트를 클립보드로 복사
   - **Paste from clipboard** — AI 출력을 바로 에디터에 붙여넣기
-- 단축키: `Esc` 취소 · `Ctrl`/`Cmd` + `Enter` apply · `Ctrl`/`Cmd` + `S` format
+- 모달 단축키: `Esc` 취소 · `Ctrl`/`Cmd` + `Enter` apply · `Ctrl`/`Cmd` + `S` format
 
 ## 설치 (개발자 모드)
 
@@ -59,6 +62,7 @@
 manifest.json   MV3 매니페스트
 content.js      감지 · 모달 · 저장 로직
 modal.css       오버레이 · 모달 스타일
+popup.html/js   툴바 팝업 (on/off)
 ```
 
 의존성 없음. 번들러 없음. 파일 수정 후 `chrome://extensions` 에서 **새로고침**.

@@ -4,6 +4,10 @@
   "version": "0.0.1",
   "description": "Edit JSON stuck inside input/textarea fields via a pretty modal editor.",
   "permissions": ["storage", "clipboardRead", "clipboardWrite"],
+  "action": {
+    "default_title": "jsonpad",
+    "default_popup": "popup.html"
+  },
   "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {
