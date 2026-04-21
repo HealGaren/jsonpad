@@ -180,13 +180,10 @@
       <div class="jsonpad-modal" role="dialog" aria-label="jsonpad">
         <div class="jsonpad-header">
           <div class="jsonpad-title">jsonpad</div>
-          <div class="jsonpad-group">
-            <div class="jsonpad-views" role="group" aria-label="view mode">
-              <button class="jsonpad-view" data-view="split">split</button>
-              <button class="jsonpad-view" data-view="raw">raw</button>
-              <button class="jsonpad-view" data-view="jsoncrack">jsoncrack</button>
-            </div>
-            <button class="jsonpad-btn" data-act="sync" title="push raw content to jsoncrack (Ctrl/Cmd+Shift+Enter)">sync →</button>
+          <div class="jsonpad-views" role="group" aria-label="view mode">
+            <button class="jsonpad-view" data-view="split">split</button>
+            <button class="jsonpad-view" data-view="raw">raw</button>
+            <button class="jsonpad-view" data-view="jsoncrack">jsoncrack</button>
           </div>
           <div class="jsonpad-group jsonpad-presets">
             <select class="jsonpad-preset-select" aria-label="presets">
@@ -197,25 +194,39 @@
           <button class="jsonpad-close" data-act="close" aria-label="close">×</button>
         </div>
         <div class="jsonpad-body" data-view="split">
-          <textarea class="jsonpad-editor jsonpad-pane" data-pane="raw" spellcheck="false" wrap="off" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+          <div class="jsonpad-pane jsonpad-raw-pane" data-pane="raw">
+            <textarea class="jsonpad-editor" spellcheck="false" wrap="off" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+            <div class="jsonpad-float-tools">
+              <button class="jsonpad-float-btn" data-act="format" title="pretty-print (Ctrl/Cmd+S)">format</button>
+              <button class="jsonpad-float-btn" data-act="validate">validate</button>
+            </div>
+          </div>
           <div class="jsonpad-resizer" role="separator" aria-orientation="vertical" title="drag to resize"></div>
-          <div class="jsonpad-viewer jsonpad-pane" data-pane="jsoncrack">
+          <div class="jsonpad-pane jsonpad-viewer jsonpad-crack-pane" data-pane="jsoncrack">
             <iframe class="jsonpad-jsoncrack" src="https://jsoncrack.com/widget" title="jsoncrack"></iframe>
+            <div class="jsonpad-float-tools">
+              <button class="jsonpad-float-btn" data-act="sync" title="sync from raw (Ctrl/Cmd+Shift+Enter)">sync ↻</button>
+              <button class="jsonpad-float-btn jsonpad-float-btn--external" data-act="open-jsoncrack-editor" title="copy JSON and open jsoncrack.com editor (paste with Ctrl/Cmd+V)"><span class="jsonpad-ext-arrow">↗</span> open</button>
+            </div>
           </div>
         </div>
-        <div class="jsonpad-status" data-status="idle"></div>
+        <div class="jsonpad-status-row">
+          <div class="jsonpad-status" data-status="idle"></div>
+          <div class="jsonpad-shortcuts" aria-label="keyboard shortcuts">
+            <span><kbd>Ctrl/⌘</kbd>+<kbd>S</kbd> format</span>
+            <span><kbd>Ctrl/⌘</kbd>+<kbd>↵</kbd> apply</span>
+            <span><kbd>Ctrl/⌘</kbd>+<kbd>⇧</kbd>+<kbd>↵</kbd> sync</span>
+            <span><kbd>Tab</kbd>/<kbd>⇧Tab</kbd> indent</span>
+            <span><kbd>Esc</kbd> cancel</span>
+          </div>
+        </div>
         <div class="jsonpad-footer">
           <div class="jsonpad-left">
-            <div class="jsonpad-group" aria-label="edit">
-              <button class="jsonpad-btn" data-act="format" title="pretty-print (Ctrl/Cmd+S)">format</button>
-              <button class="jsonpad-btn" data-act="validate">validate</button>
-            </div>
             <div class="jsonpad-group" aria-label="clipboard">
               <button class="jsonpad-btn" data-act="paste" title="paste clipboard contents into the editor">paste</button>
               <button class="jsonpad-btn" data-act="copy-prompt" title="copy a prompt template to ask AI for a schema/preset">copy AI prompt</button>
             </div>
-            <div class="jsonpad-group jsonpad-group--external" aria-label="open externally">
-              <button class="jsonpad-btn jsonpad-btn--external" data-act="open-jsoncrack-editor" title="copy JSON and open jsoncrack.com editor (paste with Ctrl/Cmd+V)"><span class="jsonpad-ext-arrow">↗</span> jsoncrack</button>
+            <div class="jsonpad-group" aria-label="open externally">
               <button class="jsonpad-btn jsonpad-btn--external" data-act="open-jsonhero" title="open in jsonhero.io with payload in URL (no server-side storage, URL stays in history)"><span class="jsonpad-ext-arrow">↗</span> JSON Hero</button>
             </div>
           </div>
