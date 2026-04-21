@@ -195,10 +195,7 @@
           <button class="jsonpad-close" data-act="close" aria-label="close">×</button>
         </div>
         <div class="jsonpad-body" data-view="split">
-          <div class="jsonpad-pane jsonpad-editor-wrap" data-pane="raw">
-            <pre class="jsonpad-highlight" aria-hidden="true"><code></code></pre>
-            <textarea class="jsonpad-editor" spellcheck="false" wrap="off" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-          </div>
+          <textarea class="jsonpad-editor jsonpad-pane" data-pane="raw" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
           <div class="jsonpad-resizer" role="separator" aria-orientation="vertical" title="drag to resize"></div>
           <div class="jsonpad-viewer jsonpad-pane" data-pane="jsoncrack">
             <iframe class="jsonpad-jsoncrack" src="https://jsoncrack.com/widget" title="jsoncrack"></iframe>
@@ -225,8 +222,6 @@
     modalHost = host;
 
     const editor = host.querySelector(".jsonpad-editor");
-    const highlightCode = host.querySelector(".jsonpad-highlight code");
-    const highlightPre = host.querySelector(".jsonpad-highlight");
     const status = host.querySelector(".jsonpad-status");
     const presetSelect = host.querySelector(".jsonpad-preset-select");
     const iframe = host.querySelector(".jsonpad-jsoncrack");
@@ -235,41 +230,12 @@
     const viewButtons = host.querySelectorAll(".jsonpad-view");
     editor.value = prettyInitial;
 
-    // ----- syntax highlighting -----
-    const escapeHtml = (s) => s.replace(/[&<>]/g, (c) =>
-      c === "&" ? "&amp;" : c === "<" ? "&lt;" : "&gt;"
-    );
-    const JSON_TOKEN = /("(?:\\.|[^"\\])*"\s*(?=:))|("(?:\\.|[^"\\])*")|(\b(?:true|false|null)\b)|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|([{}[\],:])/g;
-    const renderHighlight = (text) => {
-      let out = "";
-      let last = 0;
-      text.replace(JSON_TOKEN, (m, key, str, bool, num, punct, idx) => {
-        out += escapeHtml(text.slice(last, idx));
-        const cls = key ? "jp-key" : str ? "jp-str" : bool ? "jp-bool" : num ? "jp-num" : "jp-punct";
-        out += `<span class="${cls}">${escapeHtml(m)}</span>`;
-        last = idx + m.length;
-        return m;
-      });
-      out += escapeHtml(text.slice(last));
-      return out + "\n";
-    };
-    const updateHighlight = () => {
-      highlightCode.innerHTML = renderHighlight(editor.value);
-    };
-    const syncScroll = () => {
-      highlightPre.scrollTop = editor.scrollTop;
-      highlightPre.scrollLeft = editor.scrollLeft;
-    };
-    editor.addEventListener("input", updateHighlight);
-    editor.addEventListener("scroll", syncScroll);
-
     // ----- indent helpers -----
     const INDENT = "  ";
     const setTextareaValue = (ta, nextValue, selStart, selEnd) => {
       ta.value = nextValue;
       ta.selectionStart = selStart;
       ta.selectionEnd = selEnd ?? selStart;
-      updateHighlight();
     };
     const handleTab = (ta, shift) => {
       const { selectionStart: s, selectionEnd: e, value } = ta;
@@ -344,7 +310,6 @@
         handleEnter(editor);
       }
     });
-    updateHighlight();
 
     // ----- split resizer -----
     const applyRatio = (pct) => {
@@ -455,7 +420,6 @@
       if (!t) return;
       try {
         editor.value = toPretty(t);
-        updateHighlight();
         setStatus("formatted", "ok");
         if (activeView !== "raw") sendToJsoncrack(editor.value);
       } catch (err) {
@@ -488,7 +452,6 @@
       try {
         const txt = await navigator.clipboard.readText();
         editor.value = txt;
-        updateHighlight();
         validate();
       } catch (err) {
         setStatus(`clipboard: ${err.message}`, "err");
@@ -560,7 +523,6 @@
       } catch {
         editor.value = v;
       }
-      updateHighlight();
       setStatus(`loaded preset "${name}"`, "ok");
       if (activeView !== "raw") sendToJsoncrack(editor.value);
     };

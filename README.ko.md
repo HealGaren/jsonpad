@@ -17,7 +17,7 @@
 - `Alt` + `Shift` + `J` 로 아무 필드에서나 강제 오픈
 - 툴바 팝업: on/off 토글, 기본 레이아웃(`split` / `raw` / `jsoncrack`) 선택
 - 모달은 `raw` 에디터와 `jsoncrack` 그래프 뷰를 좌우로 같이 보여줌
-  - `raw` 에디터는 syntax highlighting, `Enter` 자동 인덴트, `Tab` / `Shift` + `Tab` 으로 현재 라인 · 멀티라인 선택 인덴트 조작 지원
+  - `raw` 에디터는 `Enter` 자동 인덴트, `Tab` / `Shift` + `Tab` 으로 현재 라인 · 멀티라인 선택 인덴트 조작 지원 (컬러 하이라이팅은 v1 에서 에디터 라이브러리 도입과 함께)
   - 헤더에서 `split` / `raw` / `jsoncrack` 3모드 전환
   - `raw` 만 편집 가능, `jsoncrack` 은 jsoncrack.com iframe 으로 읽기 전용 (데이터는 브라우저 밖으로 안 나감)
   - **sync** 버튼 또는 `Ctrl`/`Cmd` + `Shift` + `Enter` 로 현재 raw 를 그래프에 반영. 모달 열 때 · format 시 · 프리셋 로드 시 자동 sync

@@ -17,7 +17,7 @@ Admin tools often ship a form field whose "value" is a compact JSON blob. Editin
 - Force open on any field with `Alt` + `Shift` + `J`
 - Toolbar popup: enable / disable, pick default layout (`split` / `raw` / `jsoncrack`)
 - Modal with `raw` editor and a `jsoncrack` graph view side by side
-  - `raw` editor has syntax highlighting, auto-indent on `Enter`, and `Tab` / `Shift` + `Tab` to indent/dedent the current line or the multi-line selection
+  - `raw` editor has auto-indent on `Enter`, and `Tab` / `Shift` + `Tab` to indent/dedent the current line or the multi-line selection (syntax highlighting is deferred to v1 with a proper editor library)
   - Switch between layouts from the header (`split` / `raw` / `jsoncrack`)
   - `raw` is the only editable pane; `jsoncrack` is read-only (via jsoncrack.com iframe, data stays in the browser)
   - Push the current raw content into the graph with the **sync** button or `Ctrl`/`Cmd` + `Shift` + `Enter`; auto-synced on modal open, on format, and when loading a preset

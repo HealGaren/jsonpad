@@ -153,52 +153,20 @@
   padding: 0 4px;
 }
 .jsonpad-close:hover { color: #0f172a; }
-.jsonpad-editor-wrap {
-  display: block;
-  position: relative;
-  overflow: hidden;
-  background: #0b1020;
+.jsonpad-editor {
   width: 100%;
   height: 100%;
-  min-width: 0;
-  min-height: 0;
-}
-.jsonpad-highlight,
-.jsonpad-editor {
-  position: absolute;
-  inset: 0;
-  margin: 0;
+  box-sizing: border-box;
   padding: 12px;
-  font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  tab-size: 2;
-  white-space: pre;
-  word-wrap: normal;
-  overflow-wrap: normal;
-}
-.jsonpad-highlight {
-  overflow: auto;
-  color: #e2e8f0;
-  background: #0b1020;
-  pointer-events: none;
-  z-index: 0;
-}
-.jsonpad-highlight code { font: inherit; display: block; }
-.jsonpad-editor {
   border: none;
   outline: none;
   resize: none;
-  background: transparent;
-  color: transparent;
-  caret-color: #e2e8f0;
-  z-index: 1;
-  overflow: auto;
+  font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: #0b1020;
+  color: #e2e8f0;
+  tab-size: 2;
+  display: block;
 }
-.jsonpad-editor::selection { background: rgba(79, 70, 229, 0.45); }
-.jp-key { color: #93c5fd; }
-.jp-str { color: #6ee7b7; }
-.jp-num { color: #fbbf24; }
-.jp-bool { color: #c084fc; }
-.jp-punct { color: #94a3b8; }
 .jsonpad-status {
   padding: 6px 12px;
   font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
