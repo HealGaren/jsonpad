@@ -196,6 +196,7 @@
         </div>
         <div class="jsonpad-body" data-view="split">
           <textarea class="jsonpad-editor jsonpad-pane" data-pane="raw" spellcheck="false"></textarea>
+          <div class="jsonpad-resizer" role="separator" aria-orientation="vertical" title="drag to resize"></div>
           <div class="jsonpad-viewer jsonpad-pane" data-pane="jsoncrack">
             <iframe class="jsonpad-jsoncrack" src="https://jsoncrack.com/widget" title="jsoncrack"></iframe>
           </div>
@@ -224,8 +225,45 @@
     const presetSelect = host.querySelector(".jsonpad-preset-select");
     const iframe = host.querySelector(".jsonpad-jsoncrack");
     const body = host.querySelector(".jsonpad-body");
+    const resizer = host.querySelector(".jsonpad-resizer");
     const viewButtons = host.querySelectorAll(".jsonpad-view");
     editor.value = prettyInitial;
+
+    // ----- split resizer -----
+    const applyRatio = (pct) => {
+      const clamped = Math.max(15, Math.min(85, pct));
+      body.style.setProperty("--split-left", `${clamped}%`);
+      body.style.setProperty("--split-right", `${100 - clamped}%`);
+    };
+    (async () => {
+      const { splitRatio = 50 } = await chrome.storage.local.get("splitRatio");
+      applyRatio(splitRatio);
+    })();
+
+    let dragging = false;
+    const onPointerMove = (e) => {
+      if (!dragging) return;
+      const rect = body.getBoundingClientRect();
+      const pct = ((e.clientX - rect.left) / rect.width) * 100;
+      applyRatio(pct);
+    };
+    const onPointerUp = async (e) => {
+      if (!dragging) return;
+      dragging = false;
+      host.classList.remove("jsonpad-dragging");
+      resizer.releasePointerCapture?.(e.pointerId);
+      const left = parseFloat(body.style.getPropertyValue("--split-left")) || 50;
+      await chrome.storage.local.set({ splitRatio: left });
+    };
+    resizer.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      dragging = true;
+      host.classList.add("jsonpad-dragging");
+      resizer.setPointerCapture?.(e.pointerId);
+    });
+    resizer.addEventListener("pointermove", onPointerMove);
+    resizer.addEventListener("pointerup", onPointerUp);
+    resizer.addEventListener("pointercancel", onPointerUp);
 
     let iframeReady = false;
     let lastPayload = null;

@@ -42,8 +42,8 @@
   color: #0f172a;
 }
 .jsonpad-modal {
-  width: min(900px, 92vw);
-  height: min(640px, 88vh);
+  width: 96vw;
+  height: 94vh;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 20px 48px rgba(0,0,0,0.35);
@@ -91,15 +91,35 @@
   display: grid;
   min-height: 0;
   background: #0b1020;
-  gap: 1px;
 }
-.jsonpad-body[data-view="split"] { grid-template-columns: 1fr 1fr; }
+.jsonpad-body[data-view="split"] {
+  grid-template-columns: var(--split-left, 50%) 6px var(--split-right, 50%);
+}
 .jsonpad-body[data-view="raw"] { grid-template-columns: 1fr; }
 .jsonpad-body[data-view="jsoncrack"] { grid-template-columns: 1fr; }
 .jsonpad-body[data-view="raw"] .jsonpad-pane[data-pane="jsoncrack"],
-.jsonpad-body[data-view="jsoncrack"] .jsonpad-pane[data-pane="raw"] {
+.jsonpad-body[data-view="raw"] .jsonpad-resizer,
+.jsonpad-body[data-view="jsoncrack"] .jsonpad-pane[data-pane="raw"],
+.jsonpad-body[data-view="jsoncrack"] .jsonpad-resizer {
   display: none;
 }
+.jsonpad-resizer {
+  background: #1e293b;
+  cursor: col-resize;
+  position: relative;
+}
+.jsonpad-resizer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  left: -4px;
+  right: -4px;
+}
+.jsonpad-resizer:hover { background: #334155; }
+.jsonpad-dragging .jsonpad-jsoncrack,
+.jsonpad-dragging .jsonpad-editor { pointer-events: none; }
+.jsonpad-dragging { cursor: col-resize; user-select: none; }
+.jsonpad-dragging .jsonpad-resizer { background: #4f46e5; }
 .jsonpad-pane { min-width: 0; min-height: 0; display: flex; }
 .jsonpad-viewer { background: #0b1020; }
 .jsonpad-jsoncrack {
